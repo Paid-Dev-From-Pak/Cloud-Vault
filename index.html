@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CloudVault · Firebase</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f4f9 0%, #e6edf5 100%);
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+        .app-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 2rem;
+            box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.3);
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 2px solid rgba(0, 20, 50, 0.06);
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #0b1b33;
+        }
+        .logo i {
+            color: #2563eb;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 18px;
+        }
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .user-badge {
+            background: white;
+            padding: 0.4rem 1.2rem 0.4rem 1rem;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            border: 1px solid #e2e8f0;
+        }
+        .user-badge img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+        }
+        .btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.4rem;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .btn:hover {
+            background: #1d4ed8;
+            transform: scale(0.97);
+        }
+        .btn-outline {
+            background: transparent;
+            color: #1e293b;
+            border: 1px solid #d1d9e6;
+        }
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+        .btn-danger {
+            background: #ef4444;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-google {
+            background: white;
+            color: #1e293b;
+            border: 1px solid #d1d9e6;
+        }
+        .btn-google:hover {
+            background: #f8fafc;
+        }
+        .btn-google i {
+            color: #ea4335;
+        }
+        .btn-success {
+            background: #22c55e;
+        }
+        .btn-success:hover {
+            background: #16a34a;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1.8fr;
+            gap: 2rem;
+        }
+        @media (max-width: 860px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+        }
+        .panel {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+        }
+        .panel-title i {
+            color: #2563eb;
+            width: 1.8rem;
+        }
+        .input-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            background: #f8fafc;
+            outline: none;
+        }
+        .input-group input:focus {
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .category-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .category-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 1rem 0.7rem 1.2rem;
+            background: #f8fafc;
+            margin-bottom: 0.5rem;
+            border-radius: 60px;
+            border: 1px solid #eef2f6;
+            cursor: pointer;
+            font-weight: 500;
+            color: #0b1b33;
+        }
+        .category-list li:hover {
+            background: #f1f5f9;
+        }
+        .category-list li.active {
+            background: #e0edff;
+            border-color: #2563eb;
+            color: #1e3a8a;
+        }
+        .cat-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .cat-actions button {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 0.2rem 0.4rem;
+            border-radius: 30px;
+        }
+        .cat-actions .del-cat:hover {
+            color: #dc2626;
+            background: rgba(239, 68, 68, 0.08);
+        }
+        .empty-message {
+            color: #94a3b8;
+            padding: 1.2rem 0.5rem;
+            text-align: center;
+            font-style: italic;
+        }
+        .selected-cat {
+            background: #e0edff;
+            padding: 0.3rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        .file-input-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            background: #f8fafc;
+            padding: 0.8rem 1.2rem;
+            border-radius: 80px;
+            border: 1px dashed #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+        .file-input-area input[type="file"] {
+            flex: 1;
+            min-width: 150px;
+        }
+        .file-list {
+            max-height: 350px;
+            overflow-y: auto;
+            border: 1px solid #edf2f7;
+            border-radius: 24px;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem 1.2rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .file-item:hover {
+            background: #fafcff;
+        }
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            overflow: hidden;
+        }
+        .file-info i {
+            font-size: 1.3rem;
+            color: #2563eb;
+            width: 2rem;
+            text-align: center;
+        }
+        .file-name {
+            font-weight: 500;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .file-actions a,
+        .file-actions button {
+            background: transparent;
+            border: none;
+            color: #475569;
+            padding: 0.3rem 0.6rem;
+            border-radius: 30px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .file-actions a:hover {
+            background: #e2e8f0;
+        }
+        .file-actions .del-file:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .no-files {
+            padding: 2.5rem 0.5rem;
+            text-align: center;
+            color: #94a3b8;
+        }
+        .badge {
+            background: #f1f5f9;
+            padding: 0.15rem 0.8rem;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #475569;
+        }
+        .footer-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .login-card {
+            background: white;
+            max-width: 420px;
+            width: 90%;
+            padding: 2.5rem 2rem;
+            border-radius: 48px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        .login-card h2 {
+            margin-bottom: 1.8rem;
+            color: #0b1b33;
+        }
+        .login-card .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.2rem 0;
+            color: #94a3b8;
+        }
+        .login-card .divider::before,
+        .login-card .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0b1b33;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            z-index: 9999;
+        }
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .admin-panel-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .admin-panel-card {
+            background: white;
+            max-width: 500px;
+            width: 90%;
+            padding: 2rem;
+            border-radius: 28px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        .admin-panel-card h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #0b1b33;
+        }
+        .admin-panel-card input {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .admin-panel-card input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .admin-panel-card .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        .admin-panel-card .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+        .admin-panel-card .close-btn:hover {
+            color: #0b1b33;
+        }
+        .relative {
+            position: relative;
+        }
+        .admin-user-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        .admin-user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 1rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #eef2f6;
+        }
+        .admin-user-item .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-user-item .user-info .email {
+            font-weight: 500;
+            color: #0b1b33;
+        }
+        .admin-user-item .user-info .name {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        .admin-user-item .btn-danger {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        .admin-panel-card .error {
+            color: #ef4444;
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .admin-header h2 {
+            margin: 0;
+        }
+        .signup-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .signup-error.show {
+            display: block;
+        }
+        .login-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .login-error.show {
+            display: block;
+        }
+        .login-hint {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            font-size: 0.85rem;
+            padding: 0.6rem 1rem;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        /* ============================================
+           RESPONSIVE ADJUSTMENTS (visual only — no
+           functionality, IDs, or JS behavior changed)
+        ============================================ */
+        @media (max-width: 600px) {
+            body {
+                padding: 0.75rem;
+            }
+            .app-wrapper {
+                border-radius: 24px;
+                padding: 1.1rem;
+            }
+            .top-bar {
+                margin-bottom: 1.2rem;
+                padding-bottom: 0.9rem;
+            }
+            .logo {
+                font-size: 1.4rem;
+            }
+            .user-section {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .user-actions {
+                width: 100%;
+            }
+            .user-actions .btn {
+                flex: 1;
+                justify-content: center;
+                padding: 0.55rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            .panel {
+                border-radius: 18px;
+                padding: 1rem;
+            }
+            .panel-title {
+                font-size: 1.05rem;
+            }
+            .input-group input {
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+            }
+            .file-name {
+                max-width: 120px;
+            }
+            .login-card {
+                padding: 1.8rem 1.2rem;
+                border-radius: 28px;
+            }
+            .admin-panel-card {
+                padding: 1.3rem;
+                border-radius: 20px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .user-actions .btn span,
+            .user-actions .btn {
+                font-size: 0.72rem;
+                padding: 0.5rem 0.6rem;
+            }
+            .file-name {
+                max-width: 90px;
+            }
+            .footer-actions {
+                flex-direction: column;
+            }
+            .footer-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN OVERLAY -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-card">
+            <h2><i class="fas fa-cloud" style="color:#2563eb;"></i> CloudVault</h2>
+
+            <div id="emailLoginForm">
+                <button class="btn btn-google" id="googleLoginBtn" style="width:100%; justify-content:center; margin-bottom:0.8rem;">
+                    <i class="fab fa-google"></i> Sign in with Google
+                </button>
+                <button class="btn btn-google" id="googleSignupBtn" style="width:100%; justify-content:center; margin-bottom:0.8rem;">
+                    <i class="fab fa-google"></i> Sign up with Google
+                </button>
+                <div id="loginError" class="login-error"></div>
+                <p style="font-size:0.85rem; color:#94a3b8; margin-top:1.2rem;">
+                    <i class="fas fa-user-shield"></i> Admin? <span id="showAdminFromLogin" style="color:#2563eb; cursor:pointer; font-weight:600; text-decoration:underline;">Admin login</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ADMIN PANEL OVERLAY -->
+    <div class="admin-panel-overlay hidden" id="adminPanelOverlay">
+        <div class="admin-panel-card relative">
+            <button class="close-btn" id="closeAdminPanel">&times;</button>
+
+            <div id="adminLoginForm">
+                <h2><i class="fas fa-user-shield" style="color:#f59e0b;"></i> Admin Login</h2>
+                <input type="password" id="adminPassword" placeholder="Enter Admin Password" />
+                <button class="btn btn-success" id="adminLoginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+                <div id="adminLoginError" class="error hidden"></div>
+            </div>
+
+            <div id="adminDashboard" class="hidden">
+                <div class="admin-header">
+                    <h2><i class="fas fa-users-cog" style="color:#f59e0b;"></i> Admin Panel</h2>
+                    <button class="btn btn-outline" id="adminLogoutBtn" style="padding:0.3rem 1rem; font-size:0.8rem;">Logout</button>
+                </div>
+                <p style="color:#64748b; margin-bottom:1rem;">Manage all users and their data</p>
+                <div id="adminUserList" class="admin-user-list">
+                    <p style="text-align:center; color:#94a3b8;">Loading users...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div class="app-wrapper" id="appWrapper">
+        <div class="top-bar">
+            <div class="logo"><i class="fas fa-cloud-upload-alt"></i> CloudVault</div>
+            <div class="user-section">
+                <div class="user-badge" id="userBadge">
+                    <img id="userAvatar" src="" alt="avatar" style="display:none;" />
+                    <span id="userDisplay">Guest</span>
+                </div>
+                <div class="user-actions">
+                    <button class="btn btn-outline" id="adminPanelBtn" style="border-color:#f59e0b; color:#f59e0b;">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </button>
+                    <button class="btn btn-outline" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    <button class="btn btn-danger" id="deleteAccountBtn"><i class="fas fa-user-slash"></i> Delete Account</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2col">
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-folder-open"></i> Categories
+                    <span class="badge" id="catCount">0</span>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="categoryInput" placeholder="New category..." />
+                    <button class="btn" id="addCategoryBtn"><i class="fas fa-plus"></i> Add</button>
+                </div>
+                <ul class="category-list" id="categoryList">
+                    <li class="empty-message"><i class="fas fa-inbox"></i> No categories</li>
+                </ul>
+            </div>
+
+            <div class="panel">
+                <div class="data-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.8rem; margin-bottom:1.2rem;">
+                    <span><i class="fas fa-tag" style="color:#2563eb;"></i> <span class="selected-cat" id="selectedCategoryDisplay">None</span></span>
+                    <span style="font-size:0.9rem; color:#475569;"><i class="far fa-file"></i> <span id="fileCount">0</span> files</span>
+                </div>
+                <div class="file-input-area">
+                    <i class="fas fa-cloud-upload-alt" style="color:#2563eb;"></i>
+                    <input type="file" id="fileInput" multiple />
+                    <button class="btn" id="uploadFileBtn"><i class="fas fa-arrow-up"></i> Upload</button>
+                </div>
+                <p style="font-size:0.78rem; color:#94a3b8; margin:-1rem 0 1rem 0.3rem;">
+                    <i class="fas fa-circle-info"></i> Max file size: 700 KB per file. Any file type is allowed.
+                </p>
+                <div class="file-list" id="fileListContainer">
+                    <div class="no-files"><i class="far fa-folder-open"></i> Select a category</div>
+                </div>
+                <div class="footer-actions">
+                    <button class="btn" id="clearCategoryDataBtn"><i class="fas fa-trash-alt"></i> Clear files</button>
+                    <button class="btn btn-danger" id="deleteCategoryBtn"><i class="fas fa-folder-minus"></i> Delete category</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         Firebase COMPAT SDK (non-module <script> tags).
+         This works even when index.html is opened directly
+         by double-clicking (file://), unlike type="module"
+         imports which browsers block on file:// pages.
+    ============================================ -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const ADMIN_PASSWORD = "paiddev123";
+        const ADMIN_EMAIL = "syedaffansaeed051051@gmail.com";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUPzYqwuludO_8DceGvN4YQCRX2bFteoY",
+            authDomain: "cloud-vault-288ca.firebaseapp.com",
+            projectId: "cloud-vault-288ca",
+            storageBucket: "cloud-vault-288ca.firebasestorage.app",
+            messagingSenderId: "753175573815",
+            appId: "1:753175573815:web:e014afedb380f84334d6b2"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        // Firestore documents have a hard 1 MiB size limit. Base64-encoding a
+        // file inflates its size by ~33%, so we cap raw file size well below
+        // that to leave safety margin for the document's other fields.
+        const MAX_FILE_BYTES = 700 * 1024; // ~700 KB per file
+
+        // ============================================
+        // STATE
+        // ============================================
+        let currentUser = null;
+        let currentCategory = null;
+        let unsubscribe = null;
+        let isAdminLoggedIn = false;
+
+        // ============================================
+        // DOM REFS
+        // ============================================
+        const loginOverlay = document.getElementById('loginOverlay');
+        const userDisplay = document.getElementById('userDisplay');
+        const userAvatar = document.getElementById('userAvatar');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+        const adminPanelBtn = document.getElementById('adminPanelBtn');
+        const categoryInput = document.getElementById('categoryInput');
+        const addCategoryBtn = document.getElementById('addCategoryBtn');
+        const categoryList = document.getElementById('categoryList');
+        const catCount = document.getElementById('catCount');
+        const selectedCategoryDisplay = document.getElementById('selectedCategoryDisplay');
+        const fileCount = document.getElementById('fileCount');
+        const fileListContainer = document.getElementById('fileListContainer');
+        const fileInput = document.getElementById('fileInput');
+        const uploadFileBtn = document.getElementById('uploadFileBtn');
+        const clearCategoryDataBtn = document.getElementById('clearCategoryDataBtn');
+        const deleteCategoryBtn = document.getElementById('deleteCategoryBtn');
+
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const googleSignupBtn = document.getElementById('googleSignupBtn');
+        const loginError = document.getElementById('loginError');
+        const showAdminFromLogin = document.getElementById('showAdminFromLogin');
+
+        // Admin Panel DOM
+        const adminPanelOverlay = document.getElementById('adminPanelOverlay');
+        const adminLoginForm = document.getElementById('adminLoginForm');
+        const adminDashboard = document.getElementById('adminDashboard');
+        const adminPassword = document.getElementById('adminPassword');
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const adminLoginError = document.getElementById('adminLoginError');
+        const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+        const closeAdminPanel = document.getElementById('closeAdminPanel');
+        const adminUserList = document.getElementById('adminUserList');
+
+        // ============================================
+        // TOAST
+        // ============================================
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ============================================
+        // ADMIN CHECK
+        // ============================================
+        function isAdmin(user) {
+            return !!(user && user.email === ADMIN_EMAIL);
+        }
+
+        // ============================================
+        // ADMIN PANEL
+        // ============================================
+        function toggleAdminPanel(show) {
+            if (show) {
+                adminPanelOverlay.classList.remove('hidden');
+                adminLoginForm.classList.remove('hidden');
+                adminDashboard.classList.add('hidden');
+                adminPassword.value = '';
+                adminLoginError.classList.add('hidden');
+            } else {
+                adminPanelOverlay.classList.add('hidden');
+                isAdminLoggedIn = false;
+            }
+        }
+
+        async function adminLogin() {
+            const password = adminPassword.value.trim();
+            if (password === ADMIN_PASSWORD) {
+                isAdminLoggedIn = true;
+                adminLoginForm.classList.add('hidden');
+                adminDashboard.classList.remove('hidden');
+                adminLoginError.classList.add('hidden');
+                await loadAllUsers();
+                showToast('Admin login successful!');
+            } else {
+                adminLoginError.textContent = 'Wrong password!';
+                adminLoginError.classList.remove('hidden');
+            }
+        }
+
+        function adminLogout() {
+            isAdminLoggedIn = false;
+            adminLoginForm.classList.remove('hidden');
+            adminDashboard.classList.add('hidden');
+            adminPassword.value = '';
+            adminLoginError.classList.add('hidden');
+            showToast('Admin logged out');
+        }
+
+        async function loadAllUsers() {
+            try {
+                const querySnapshot = await db.collection('users').get();
+
+                if (querySnapshot.empty) {
+                    adminUserList.innerHTML = '<p style="text-align:center; color:#94a3b8;">No users found</p>';
+                    return;
+                }
+
+                let html = '';
+                let visibleCount = 0;
+                querySnapshot.forEach((docSnap) => {
+                    const userData = docSnap.data();
+                    if (userData.deleted) return;
+                    visibleCount++;
+                    html += `
+                        <div class="admin-user-item">
+                            <div class="user-info">
+                                <span class="email">${userData.email}</span>
+                                <span class="name">${userData.name || 'No name'}</span>
+                            </div>
+                            <button class="btn btn-danger admin-delete-user" data-email="${userData.email}" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+                if (!visibleCount) {
+                    html = '<p style="text-align:center; color:#94a3b8;">No users found</p>';
+                }
+                adminUserList.innerHTML = html;
+
+                document.querySelectorAll('.admin-delete-user').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const email = btn.dataset.email;
+                        if (confirm(`Are you sure you want to delete user: ${email}?\n\nThis will permanently delete all their data!`)) {
+                            try {
+                                await db.collection('users').doc(email).set({
+                                    email: email,
+                                    deleted: true,
+                                    deletedAt: new Date().toISOString()
+                                });
+                                showToast(`User ${email} deleted successfully!`);
+                                await loadAllUsers();
+                            } catch (err) {
+                                alert('Failed to delete user: ' + err.message);
+                            }
+                        }
+                    });
+                });
+            } catch (error) {
+                adminUserList.innerHTML = `<p style="text-align:center; color:#ef4444;">Error loading users: ${error.message}</p>`;
+            }
+        }
+
+        // ============================================
+        // AUTH FUNCTIONS (Google sign-in / sign-up)
+        // ============================================
+        async function googleAuth(intent) {
+            loginError.classList.remove('show');
+            loginError.textContent = '';
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                const userRef = db.collection('users').doc(user.email);
+                const docSnap = await userRef.get();
+                const exists = docSnap.exists;
+                const existingData = exists ? docSnap.data() : null;
+
+                if (exists && existingData && existingData.deleted) {
+                    await auth.signOut();
+                    alert(
+                        `This account was deleted by the administrator.\n\n` +
+                        `To reactivate it, please contact:\n\n${ADMIN_EMAIL}`
+                    );
+                    return;
+                }
+
+                if (intent === 'login' && !exists) {
+                    await auth.signOut();
+                    loginError.textContent = 'No account found with this Google account. Please use "Sign up with Google" first.';
+                    loginError.classList.add('show');
+                    return;
+                }
+
+                if (intent === 'signup' && exists) {
+                    // Account already exists — just log them in instead of erroring out.
+                    showToast('Account already exists — logging you in.');
+                }
+
+                await setupUser(user);
+            } catch (error) {
+                if (error.code === 'auth/popup-closed-by-user') {
+                    showToast('Sign-in cancelled');
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    loginError.textContent = 'Google sign-in is disabled in Firebase Console. Enable it under Authentication > Sign-in method.';
+                    loginError.classList.add('show');
+                } else {
+                    loginError.textContent = 'Google sign-in failed: ' + error.message;
+                    loginError.classList.add('show');
+                }
+            }
+        }
+        // ============================================
+        // SETUP USER (after login/signup)
+        // ============================================
+        async function setupUser(user, fallbackName) {
+            const userRef = db.collection('users').doc(user.email);
+            const docSnap = await userRef.get();
+
+            if (docSnap.exists && docSnap.data().deleted) {
+                await auth.signOut();
+                alert(
+                    `This account was deleted by the administrator.\n\n` +
+                    `To reactivate it, please contact:\n\n${ADMIN_EMAIL}`
+                );
+                loginOverlay.classList.remove('hidden');
+                return;
+            }
+
+            if (docSnap.exists) {
+                const userData = docSnap.data();
+                currentUser = {
+                    email: user.email,
+                    name: userData.name || fallbackName || user.displayName || user.email,
+                    data: userData.data || { categories: ['Work', 'Personal'], files: { 'Work': [], 'Personal': [] } },
+                    picture: user.photoURL || null
+                };
+                if (currentUser.data.categories.length > 0) {
+                    currentCategory = currentUser.data.categories[0];
+                }
+                renderAll();
+                loginOverlay.classList.add('hidden');
+                userDisplay.textContent = currentUser.name;
+                if (currentUser.picture) {
+                    userAvatar.src = currentUser.picture;
+                    userAvatar.style.display = 'inline';
+                } else {
+                    userAvatar.style.display = 'none';
+                }
+                showToast('Welcome, ' + currentUser.name + '!');
+
+                updateAdminUI();
+
+                if (unsubscribe) unsubscribe();
+                unsubscribe = userRef.onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const updatedData = doc.data();
+                        currentUser.data = updatedData.data || { categories: [], files: {} };
+                        if (currentUser.data.categories.length > 0 && !currentCategory) {
+                            currentCategory = currentUser.data.categories[0];
+                        }
+                        renderAll();
+                    }
+                });
+            } else {
+                // First-time Google sign-in: create their user doc automatically.
+                try {
+                    await userRef.set({
+                        name: fallbackName || user.displayName || user.email,
+                        email: user.email,
+                        data: {
+                            categories: ['Work', 'Personal'],
+                            files: {
+                                'Work': [],
+                                'Personal': []
+                            }
+                        }
+                    });
+                    await setupUser(user, fallbackName);
+                } catch (error) {
+                    showToast('Failed to create account: ' + error.message);
+                    await auth.signOut();
+                }
+            }
+        }
+
+        // ============================================
+        // UPDATE ADMIN UI
+        // ============================================
+        function updateAdminUI() {
+            if (isAdmin(currentUser)) {
+                adminPanelBtn.classList.remove('hidden');
+            } else {
+                adminPanelBtn.classList.add('hidden');
+            }
+        }
+
+        // ============================================
+        // DELETE ACCOUNT
+        // Nobody can delete their own account from this button — not even
+        // the admin. Clicking it always shows a popup telling the person
+        // to contact the administrator by email. (The admin can still
+        // delete any user's account properly from the Admin Panel.)
+        // ============================================
+        function deleteAccount() {
+            if (!currentUser) return alert('No user logged in');
+
+            alert(
+                `Account Deletion Request\n\n` +
+                `To delete your account, please contact the administrator:\n\n` +
+                `${ADMIN_EMAIL}\n\n` +
+                `Please send your request with your registered email address. ` +
+                `The admin will review and delete your account if approved.`
+            );
+        }
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        async function logoutUser() {
+            if (unsubscribe) {
+                unsubscribe();
+                unsubscribe = null;
+            }
+            await auth.signOut();
+            currentUser = null;
+            currentCategory = null;
+            loginOverlay.classList.remove('hidden');
+            userDisplay.textContent = 'Guest';
+            userAvatar.style.display = 'none';
+            renderAll();
+            updateAdminUI();
+            showToast('Logged out successfully!');
+        }
+
+        // ============================================
+        // DATA FUNCTIONS
+        // ============================================
+        async function saveUserData() {
+            if (!currentUser) return;
+            await db.collection('users').doc(currentUser.email).update({
+                data: currentUser.data
+            });
+        }
+
+        // ============================================
+        // RENDER FUNCTIONS
+        // ============================================
+        function renderCategories() {
+            const cats = currentUser?.data?.categories || [];
+            categoryList.innerHTML = '';
+            if (!cats.length) {
+                categoryList.innerHTML = '<li class="empty-message"><i class="fas fa-inbox"></i> No categories</li>';
+                catCount.textContent = '0';
+                return;
+            }
+            catCount.textContent = cats.length;
+            cats.forEach(cat => {
+                const li = document.createElement('li');
+                li.textContent = cat;
+                if (cat === currentCategory) li.classList.add('active');
+
+                const actions = document.createElement('span');
+                actions.className = 'cat-actions';
+
+                const renameBtn = document.createElement('button');
+                renameBtn.innerHTML = '<i class="fas fa-pen"></i>';
+                renameBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const newName = prompt(`Rename "${cat}" to:`, cat);
+                    if (newName && newName.trim() && newName.trim() !== cat) {
+                        const trimmed = newName.trim();
+                        if (currentUser.data.categories.includes(trimmed)) {
+                            alert('Category exists');
+                            return;
+                        }
+                        if (currentUser.data.files[cat]) {
+                            currentUser.data.files[trimmed] = currentUser.data.files[cat];
+                            delete currentUser.data.files[cat];
+                        } else {
+                            currentUser.data.files[trimmed] = [];
+                        }
+                        const idx = currentUser.data.categories.indexOf(cat);
+                        if (idx !== -1) currentUser.data.categories[idx] = trimmed;
+                        if (currentCategory === cat) currentCategory = trimmed;
+                        await saveUserData();
+                        renderAll();
+                    }
+                });
+
+                const delBtn = document.createElement('button');
+                delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                delBtn.className = 'del-cat';
+                delBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (confirm(`Delete category "${cat}" and all files?`)) {
+                        delete currentUser.data.files[cat];
+                        currentUser.data.categories = currentUser.data.categories.filter(c => c !== cat);
+                        if (currentCategory === cat) currentCategory = null;
+                        await saveUserData();
+                        renderAll();
+                    }
+                });
+
+                actions.appendChild(renameBtn);
+                actions.appendChild(delBtn);
+                li.appendChild(actions);
+
+                li.addEventListener('click', () => {
+                    currentCategory = cat;
+                    renderAll();
+                });
+
+                categoryList.appendChild(li);
+            });
+        }
+
+        function renderFiles() {
+            if (!currentCategory) {
+                selectedCategoryDisplay.textContent = 'None';
+                fileListContainer.innerHTML =
+                    `<div class="no-files"><i class="far fa-folder-open"></i> Select a category</div>`;
+                fileCount.textContent = '0';
+                return;
+            }
+            selectedCategoryDisplay.textContent = currentCategory;
+            const files = currentUser?.data?.files?.[currentCategory] || [];
+            fileCount.textContent = files.length;
+
+            if (!files.length) {
+                fileListContainer.innerHTML = `<div class="no-files"><i class="far fa-file"></i> No files</div>`;
+                return;
+            }
+
+            let html = '';
+            files.forEach((file, index) => {
+                const icon = file.type?.startsWith('image/') ? 'fa-image' :
+                    file.type?.includes('pdf') ? 'fa-file-pdf' :
+                    file.type?.includes('text') ? 'fa-file-alt' : 'fa-file';
+                const size = file.size ? (file.size / 1024).toFixed(1) + ' KB' : '—';
+                html += `
+              <div class="file-item">
+                <div class="file-info">
+                  <i class="fas ${icon}"></i>
+                  <span class="file-name" title="${file.name}">${file.name}</span>
+                  <span style="font-size:0.7rem; color:#94a3b8;">${size}</span>
+                </div>
+                <div class="file-actions">
+                  <a href="#" class="preview-file" data-index="${index}" title="Preview"><i class="fas fa-eye"></i></a>
+                  <a href="#" class="download-file" data-index="${index}" title="Download"><i class="fas fa-download"></i></a>
+                  <button class="del-file" data-index="${index}" title="Delete"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+            `;
+            });
+            fileListContainer.innerHTML = html;
+
+            document.querySelectorAll('.preview-file').forEach(el => {
+                el.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const idx = parseInt(el.dataset.index);
+                    const file = currentUser.data.files[currentCategory]?.[idx];
+                    if (file) await previewFile(file);
+                });
+            });
+
+            document.querySelectorAll('.download-file').forEach(el => {
+                el.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const idx = parseInt(el.dataset.index);
+                    const file = currentUser.data.files[currentCategory]?.[idx];
+                    if (file) await downloadFile(file);
+                });
+            });
+
+            document.querySelectorAll('.del-file').forEach(el => {
+                el.addEventListener('click', async () => {
+                    const idx = parseInt(el.dataset.index);
+                    const file = currentUser.data.files[currentCategory]?.[idx];
+                    if (confirm(`Delete "${file?.name}"?`)) {
+                        if (file && file.id) {
+                            try {
+                                await db.collection('users').doc(currentUser.email).collection('files').doc(file.id).delete();
+                            } catch (err) {
+                                console.error('Failed to delete file document:', err);
+                            }
+                        }
+                        currentUser.data.files[currentCategory].splice(idx, 1);
+                        await saveUserData();
+                        renderFiles();
+                    }
+                });
+            });
+        }
+
+        async function fetchFileContent(file) {
+            if (file.content) return file.content; // backward compat if content was already embedded
+            if (!file.id) throw new Error('No file reference found.');
+            const docSnap = await db.collection('users').doc(currentUser.email).collection('files').doc(file.id).get();
+            if (!docSnap.exists) throw new Error('File data not found — it may have been deleted.');
+            return docSnap.data().content;
+        }
+
+        async function downloadFile(file) {
+            try {
+                const content = await fetchFileContent(file);
+                if (!content) throw new Error('No content available');
+                let blob;
+                if (typeof content === 'string' && content.startsWith('data:')) {
+                    const parts = content.split(',');
+                    const raw = atob(parts[1]);
+                    const uInt8 = new Uint8Array(raw.length);
+                    for (let i = 0; i < raw.length; i++) uInt8[i] = raw.charCodeAt(i);
+                    blob = new Blob([uInt8], { type: file.type || 'application/octet-stream' });
+                } else {
+                    blob = new Blob([content], { type: file.type || 'text/plain' });
+                }
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name || 'download';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                alert('Download error: ' + err.message);
+            }
+        }
+
+        async function previewFile(file) {
+            try {
+                const content = await fetchFileContent(file);
+                if (!content) throw new Error('No content available');
+                if (typeof content === 'string' && content.startsWith('data:')) {
+                    window.open(content, '_blank');
+                } else {
+                    const blob = new Blob([content], { type: file.type || 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                }
+            } catch (err) {
+                alert('Preview error: ' + err.message);
+            }
+        }
+
+        function renderAll() {
+            renderCategories();
+            renderFiles();
+        }
+
+        // ============================================
+        // UI ACTIONS
+        // ============================================
+        async function addCategory() {
+            if (!currentUser) return alert('Login first');
+            const name = categoryInput.value.trim();
+            if (!name) return alert('Enter category name');
+            if (currentUser.data.categories.includes(name)) return alert('Category exists');
+            currentUser.data.categories.push(name);
+            if (!currentUser.data.files[name]) currentUser.data.files[name] = [];
+            categoryInput.value = '';
+            currentCategory = name;
+            await saveUserData();
+            renderAll();
+            showToast('Category created: ' + name);
+        }
+
+        async function uploadFiles() {
+            if (!currentUser) return alert('Login first');
+            if (!currentCategory) return alert('Select a category');
+            const files = fileInput.files;
+            if (!files.length) return alert('Choose files');
+
+            uploadFileBtn.disabled = true;
+            uploadFileBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+            const catFiles = currentUser.data.files[currentCategory] || [];
+            const filesCollection = db.collection('users').doc(currentUser.email).collection('files');
+            let successCount = 0;
+            let failCount = 0;
+            const oversizeNames = [];
+
+            for (const f of files) {
+                if (f.size > MAX_FILE_BYTES) {
+                    oversizeNames.push(f.name);
+                    failCount++;
+                    continue;
+                }
+                try {
+                    const content = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.onerror = () => reject(new Error('Could not read file'));
+                        if (f.type && f.type.startsWith('text/')) reader.readAsText(f);
+                        else reader.readAsDataURL(f);
+                    });
+
+                    const docRef = await filesCollection.add({
+                        category: currentCategory,
+                        name: f.name,
+                        type: f.type,
+                        size: f.size,
+                        content: content
+                    });
+
+                    catFiles.push({
+                        id: docRef.id,
+                        name: f.name,
+                        type: f.type,
+                        size: f.size
+                    });
+                    successCount++;
+                } catch (err) {
+                    failCount++;
+                    console.error('Upload failed for', f.name, err);
+                }
+            }
+
+            uploadFileBtn.disabled = false;
+            uploadFileBtn.innerHTML = '<i class="fas fa-arrow-up"></i> Upload';
+
+            if (successCount > 0) {
+                try {
+                    await saveUserData();
+                } catch (err) {
+                    alert('Files uploaded but failed to save the file list: ' + err.message);
+                    return;
+                }
+                renderFiles();
+            }
+
+            fileInput.value = '';
+
+            if (oversizeNames.length) {
+                alert(
+                    `These files are too large for the free plan (max ${(MAX_FILE_BYTES / 1024).toFixed(0)}KB each) and were skipped:\n\n` +
+                    oversizeNames.join('\n')
+                );
+            }
+
+            if (failCount === 0) {
+                showToast('Files uploaded successfully!');
+            } else if (successCount > 0) {
+                showToast(`${successCount} uploaded, ${failCount} failed/skipped.`);
+            } else if (!oversizeNames.length) {
+                alert('Upload failed. Check the browser console for details.');
+            }
+        }
+
+        async function clearCategoryData() {
+            if (!currentUser || !currentCategory) return alert('Select a category');
+            if (confirm(`Clear all files in "${currentCategory}"?`)) {
+                const files = currentUser.data.files[currentCategory] || [];
+                const filesCollection = db.collection('users').doc(currentUser.email).collection('files');
+                await Promise.all(files.map(f => {
+                    if (!f.id) return Promise.resolve();
+                    return filesCollection.doc(f.id).delete().catch(err => console.error('Delete failed:', err));
+                }));
+                currentUser.data.files[currentCategory] = [];
+                await saveUserData();
+                renderFiles();
+                showToast('Files cleared');
+            }
+        }
+
+        async function deleteCategory() {
+            if (!currentUser || !currentCategory) return alert('Select a category');
+            if (confirm(`Delete category "${currentCategory}" and all files?`)) {
+                const files = currentUser.data.files[currentCategory] || [];
+                const filesCollection = db.collection('users').doc(currentUser.email).collection('files');
+                await Promise.all(files.map(f => {
+                    if (!f.id) return Promise.resolve();
+                    return filesCollection.doc(f.id).delete().catch(err => console.error('Delete failed:', err));
+                }));
+                delete currentUser.data.files[currentCategory];
+                currentUser.data.categories = currentUser.data.categories.filter(c => c !== currentCategory);
+                currentCategory = null;
+                await saveUserData();
+                renderAll();
+                showToast('Category deleted');
+            }
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        googleLoginBtn.addEventListener('click', () => googleAuth('login'));
+        googleSignupBtn.addEventListener('click', () => googleAuth('signup'));
+        showAdminFromLogin.addEventListener('click', () => toggleAdminPanel(true));
+
+        logoutBtn.addEventListener('click', logoutUser);
+        deleteAccountBtn.addEventListener('click', deleteAccount);
+
+        // Admin Panel Events
+        adminPanelBtn.addEventListener('click', () => toggleAdminPanel(true));
+        closeAdminPanel.addEventListener('click', () => toggleAdminPanel(false));
+        adminLoginBtn.addEventListener('click', adminLogin);
+        adminLogoutBtn.addEventListener('click', adminLogout);
+
+        adminPassword.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') adminLogin();
+        });
+
+        adminPanelOverlay.addEventListener('click', (e) => {
+            if (e.target === adminPanelOverlay) {
+                toggleAdminPanel(false);
+            }
+        });
+
+        addCategoryBtn.addEventListener('click', addCategory);
+        categoryInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addCategory(); });
+        uploadFileBtn.addEventListener('click', uploadFiles);
+        clearCategoryDataBtn.addEventListener('click', clearCategoryData);
+        deleteCategoryBtn.addEventListener('click', deleteCategory);
+
+        // ============================================
+        // INIT
+        // ============================================
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                await setupUser(user);
+            } else {
+                loginOverlay.classList.remove('hidden');
+            }
+        });
+
+        console.log('CloudVault ready (Firebase compat SDK)');
+    </script>
+</body>
+</html>
+
+
+<!-- Cloud-Vault -->
+<!-- CloudVault — A Firebase-powered personal file vault with Google sign-in, category-based file organization, and an admin panel for user management. -->
